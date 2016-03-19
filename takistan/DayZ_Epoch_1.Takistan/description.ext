@@ -1,0 +1,583 @@
+#include "ZSC\config\cfgServerTrader.hpp"
+
+respawn = "BASE";
+respawndelay = 5;
+onLoadMission="OverPochIns Takistan";
+OnLoadIntro = "Welcome to DayZ OverPochIns Takistan";
+OnLoadIntroTime = False;
+OnLoadMissionTime = False;
+disabledAI = true;
+disableChannels[]={0,2,6};
+enableItemsDropping=0;
+
+//Custom Loot Tables
+#include "custom\loot\CfgBuildingLoot.hpp"
+
+briefing = 0;
+debriefing = 0;
+
+//onPauseScript = "";
+onPauseScript = "custom\dupingfix\DupingFix.sqf";
+loadScreen = "custom\loadscreen.jpg";
+
+class Header
+{
+ gameType = COOP;            //DM, Team, Coop, ...
+ minPlayers = 1;             //min # of players the mission supports
+ maxPlayers = 100;            //Max # of players the mission supports
+};
+
+aiKills = 1;
+diagRadio = 1;
+diagHit = 1;
+
+class RscText
+{
+	type = 0;
+	idc = -1;
+	x = 0;
+	y = 0;
+	h = 0.037;
+	w = 0.3;
+	style = 0x100; 
+	font = Zeppelin32;
+	SizeEx = 0.03921;
+	colorText[] = {1,1,1,1};
+	colorBackground[] = {0, 0, 0, 0};
+	linespacing = 1;
+};
+class RscPicture
+{
+	access=0;
+	type=0;
+	idc=-1;
+	style=48;
+	colorBackground[]={0,0,0,0};
+	colorText[]={1,1,1,1};
+	font="TahomaB";
+	sizeEx=0;
+	lineSpacing=0;
+	text="";
+};
+class CfgSounds
+{
+    sounds[] =
+    {
+		carLock,stronghold
+    };
+	 class stronghold
+    {
+        name = "stronghold";
+        sound[] = {sounds\vrata_sound.ogg,0.3,1};
+        titles[] = {};
+    };
+    class carLock
+    {
+		name = "carLock";
+		sound[] = {sounds\carlock.ogg,0.9,1};
+		titles[] = {};
+    };
+	class mining
+	{
+		name = "mining";
+		sound[] = {sounds\mining.ogg,0.3,1};
+		titles[] = {};
+	};	
+	class nam
+	{
+		name = "Siren1";
+		sound[] = {\custom\airraid\sound\SirenLoopMono.ogg, db-6, 1.0};
+		titles[] = {""};
+	};
+	class eve
+	{
+		name = "Siren2";
+		sound[] = {\custom\airraid\sound\Sirens.ogg, db-6, 1.0};
+		titles[] = {""};
+	};
+		class puk
+	{
+		name = "Siren3";
+		sound[] = {\custom\airraid\sound\Sirens2.ogg, db-6, 1.0};
+		titles[] = {""};
+	};		
+};
+class RscLoadingText : RscText
+{
+	style = 2;
+	x = 0.323532;
+	y = 0.666672;
+	w = 0.352944;
+	h = 0.039216;
+	sizeEx = 0.03921;
+	colorText[] = {0.543,0.5742,0.4102,1.0};
+};
+class RscProgress
+{
+	x = 0.344;
+	y = 0.619;
+	w = 0.313726;
+	h = 0.0261438;
+	texture = "\ca\ui\data\loadscreen_progressbar_ca.paa";
+	colorFrame[] = {0,0,0,0};
+	colorBar[] = {1,1,1,1};
+};
+class RscProgressNotFreeze
+{
+	idc = -1;
+	type = 45;
+	style = 0;
+	x = 0.022059;
+	y = 0.911772;
+	w = 0.029412;
+	h = 0.039216;
+	texture = "#(argb,8,8,3)color(0,0,0,0)";
+};
+//
+// the loading screen itself
+//
+class DayZ_loadingScreen
+{ 
+	idd = -1;
+	duration = 10e10;
+	fadein = 0;
+	fadeout = 0;
+	name = "loading screen";
+	class controlsBackground
+	{
+		class blackBG : RscText
+		{
+			x = safezoneX;
+			y = safezoneY;
+			w = safezoneW;
+			h = safezoneH;
+			text = "";
+			colorText[] = {0,0,0,0};
+			colorBackground[] = {0,0,0,1};
+		};
+		/*
+		class nicePic : RscPicture
+		{
+			style = 48 + 0x800; // ST_PICTURE + ST_KEEP_ASPECT_RATIO
+			x = safezoneX + safezoneW/2 - 0.25;
+			y = safezoneY + safezoneH/2 - 0.2;
+			w = 0.5;
+			h = 0.4;
+			text = "img\nicePic.paa";
+		};
+		*/
+	};
+	class controls
+	{
+		class Title1 : RscLoadingText
+		{
+			text = "$STR_LOADING"; // "Loading" text in the middle of the screen
+		};
+		class CA_Progress : RscProgress // progress bar, has to have idc 104
+		{
+			idc = 104;
+			type = 8; // CT_PROGRESS
+			style = 0; // ST_SINGLE
+			texture = "\ca\ui\data\loadscreen_progressbar_ca.paa";
+		};
+		class CA_Progress2 : RscProgressNotFreeze // progress bar that will go reverse
+		{
+			idc = 103;
+		};
+		class Name2: RscText // the text on the top-left
+		{
+			idc = 101;
+			x = 0.05;
+			y = 0.029412;
+			w = 0.9;
+			h = 0.04902;
+			text = "";
+			sizeEx = 0.05;
+			colorText[] = {0.543,0.5742,0.4102,1.0};
+		};
+	};
+};
+
+class RscPictureGUI
+{
+	access=0;
+	type=0;
+	idc=-1;
+	colorBackground[]={0,0,0,0};
+	colorText[]={0.38,0.63,0.25999999,0.75};
+	font="TahomaB";
+	sizeEx=0;
+	lineSpacing=0;
+	text="";
+	style="0x30 + 0x100";
+	x=0;
+	y=0;
+	w=0.2;
+	h=0.15000001;
+};
+
+class RscTextGUIK {
+    type = 0;
+    idc = -1;
+    style = 0x02;
+    colorBackground[] = {0,0,0,0};
+    colorText[] = {1, 1, 1, 0.5};
+    //color[] = {1, 1, 1, 0.5};
+    font = "TahomaB";
+    size = 0.03;
+    sizeEx = 0.03;
+    x = 0;
+    y = 0;
+    w = 0.1;
+    h = 0.2;
+};	
+
+class RscStructuredTextGUI {
+	access = ReadAndWrite;
+	type = 13;
+	idc = -1;
+	style = 2; 
+	font = "Zeppelin33";
+	size = "0.025 * safezoneH";
+	colorText[] = {1,1,1,1};
+	colorBackground[] = {0, 0, 0, 0};
+	text = "";
+	shadow = 1;
+	class Attributes {
+		align = "center";
+		valign = "middle";	
+	};
+};
+
+// DayZ Watermark
+class RscTitles {
+#include "ZSC\config\ZSChud.hpp"
+	class wm_disp {
+		idd = -1;
+		onLoad = "uiNamespace setVariable ['wm_disp', _this select 0]";
+		fadein = 0;
+		fadeout = 0;
+		duration = 10e10;
+		controlsBackground[] = {};
+		objects[] = {};
+		class controls {
+			class wm_text2 {
+				idc = 1;
+				x = safeZoneX+0.027;//safeZoneW*0.01;
+				y = safeZoneY+safeZoneH-0.16;
+				w = 1.151*safeZoneH;
+				h = 0.057*safeZoneH;
+				shadow = 2;
+				class Attributes
+				{
+					font = "EtelkaNarrowMediumPro";
+					color = "#24FFFFFF";
+					align = "left"; // put "center" here if you want some background
+					valign = "middle";
+					shadow = 2;
+				};
+				colorBackground[] = { 1, 0.3, 0, 0 };  // uncomment and increase 4th number to have a background
+				font = "EtelkaNarrowMediumPro";
+				size = 0.06*safeZoneH;
+				type = 13;
+				style = 0;
+				text="";
+			};
+		};
+	};	
+	class playerStatusGUI {
+        idd = 6900;
+        movingEnable = 0;
+        duration = 100000;
+        name = "statusBorder";
+        onLoad = "uiNamespace setVariable ['DAYZ_GUI_display', _this select 0];";
+        class ControlsBackground {
+			//PLAYER NAME
+			class RscStructuredText_1199 : RscStructuredTextGUI {
+				idc = 1199;
+				x = 0.250001;
+				y = 0.350001;
+				w = 0.5;
+				h = 0.1;
+			};
+			//FOOD BACKGROUND
+            class RscPicture_1901: RscPictureGUI
+            {
+                idc = 1901;
+                text = "\z\addons\dayz_code\gui\status\status_bg.paa";
+                x = 0.905 * safezoneW + safezoneX;
+                y = 0.93 * safezoneH + safezoneY;//2
+                w = 0.075;
+                h = 0.10;
+            };
+			//FOOD BORDER
+            class RscPicture_1201: RscPictureGUI
+            {
+                idc = 1201;
+                text = "\z\addons\dayz_code\gui\status\status_food_border_ca.paa";
+                x = 0.905 * safezoneW + safezoneX;
+                y = 0.93 * safezoneH + safezoneY;//2
+                w = 0.075;
+                h = 0.10;
+            };
+			//BLOOD BACKGROUND
+            class RscPicture_1900: RscPictureGUI
+            {
+                idc = 1900;
+                text = "\z\addons\dayz_code\gui\status\status_bg.paa";
+                x = 0.875 * safezoneW + safezoneX;
+                y = 0.93 * safezoneH + safezoneY; //3
+                w = 0.075;
+                h = 0.10;
+            };
+			//BLOOD BORDER
+            class RscPicture_1200: RscPictureGUI
+            {
+                idc = 1200;
+                text = "\z\addons\dayz_code\gui\status\status_blood_border_ca.paa";
+                x = 0.875 * safezoneW + safezoneX;
+                y = 0.93* safezoneH + safezoneY; //3
+                w = 0.075;
+                h = 0.10;
+            };
+			//THIRST BACKGROUND
+            class RscPicture_1902: RscPictureGUI
+            {
+                idc = 1902;
+                text = "\z\addons\dayz_code\gui\status\status_bg.paa";
+                x = 0.935 * safezoneW + safezoneX;
+                y = 0.93 * safezoneH + safezoneY; //1
+                w = 0.075;
+                h = 0.10;
+            };
+			//THIRST BORDER
+            class RscPicture_1202: RscPictureGUI
+            {
+                idc = 1202;
+                text = "\z\addons\dayz_code\gui\status\status_thirst_border_ca.paa";
+                x = 0.935 * safezoneW + safezoneX;
+                y = 0.93 * safezoneH + safezoneY; //1
+                w = 0.075;
+                h = 0.10;
+            };
+			//TEMP BACKGROUND
+            class RscPicture_1908: RscPictureGUI
+            {
+                idc = 1908;
+                text = "\z\addons\dayz_code\gui\status\status_bg.paa";
+                x = 0.845 * safezoneW + safezoneX;
+                y = 0.93 * safezoneH + safezoneY; //3
+                w = 0.075;
+                h = 0.10;
+            };
+			//TEMP BORDER
+            class RscPicture_1208: RscPictureGUI
+            {
+                idc = 1208;
+                text = "\z\addons\dayz_code\gui\status\status_temp_outside_ca.paa";
+                x = 0.845 * safezoneW + safezoneX;
+                y = 0.93 * safezoneH + safezoneY; //3
+                w = 0.075;
+                h = 0.10;
+            };
+			//BROKEN LEG
+            class RscPicture_1203: RscPictureGUI
+            {
+                idc = 1203;
+                text = "\z\addons\dayz_code\gui\status\status_effect_brokenleg.paa";
+                x = 0.810 * safezoneW + safezoneX;
+                y = 0.93 * safezoneH + safezoneY;
+                w = 0.075;
+                h = 0.10;
+                colorText[] = {1,1,1,1};
+            };
+            /*--------------------------------------------*/
+            //SURVIVOR ICON
+			class RscPicture_1307: RscPictureGUI
+            {
+                idc = 1307;
+                text = "custom\gui\status\st_humanity_survivor.paa";
+                x = 0.670 * safezoneW + safezoneX;
+                y = 0.933 * safezoneH + safezoneY;
+                w = 0.027 * safezoneW;
+                h = 0.037 * safezoneH;
+                colorText[] = {1,1,1,1};
+            };
+			//BANDIT ICON
+            class RscPicture_1309: RscPictureGUI
+            {
+                idc = 1309;
+                text = "custom\gui\status\st_humanity_bandit.paa";
+                x = 0.713 * safezoneW + safezoneX;
+                y = 0.933 * safezoneH + safezoneY;
+                w = 0.027 * safezoneW;
+                h = 0.037 * safezoneH;
+                colorText[] = {1,1,1,1};
+            };
+			//ZOMBIE ICON
+            class RscPicture_1310: RscPictureGUI
+            {
+                idc = 1310;
+                text = "custom\gui\status\zombie.paa";
+                x = 0.756 * safezoneW + safezoneX;
+                y = 0.933 * safezoneH + safezoneY;
+                w = 0.027 * safezoneW;
+                h = 0.037 * safezoneH;
+                colorText[] = {1,1,1,1};
+            };
+        };
+        class Controls {
+			//FOOD ICON
+            class RscPicture_1301: RscPictureGUI
+            {
+                idc = 1301;
+                //text = "\z\addons\dayz_code\gui\status\status_food_inside_ca.paa";
+                x = 0.905 * safezoneW + safezoneX;
+                y = 0.93 * safezoneH + safezoneY;
+                w = 0.075;
+                h = 0.10;
+            };
+			//BLOOD ICON
+            class RscPicture_1300: RscPictureGUI
+            {
+                idc = 1300;
+                //text = "\z\addons\dayz_code\gui\status\status_blood_inside_ca.paa";
+                x = 0.875 * safezoneW + safezoneX;
+                y = 0.93 * safezoneH + safezoneY;
+                w = 0.075;
+                h = 0.10;
+            };
+			//THIRST ICON
+            class RscPicture_1302: RscPictureGUI
+            {
+                idc = 1302;
+                //text = "\z\addons\dayz_code\gui\status\status_thirst_inside_ca.paa";
+                x = 0.935 * safezoneW + safezoneX;
+                y = 0.93 * safezoneH + safezoneY;
+                w = 0.075;
+                h = 0.10;
+            };
+			//TEMP ICON
+            class RscPicture_1306: RscPictureGUI
+            {
+                idc = 1306;
+                //text = "\z\addons\dayz_code\gui\status\status_temp_ca.paa";
+                x = 0.845 * safezoneW + safezoneX;
+                y = 0.93 * safezoneH + safezoneY;
+                w = 0.075;
+                h = 0.10;
+            };
+			//BLOOD ICON - BLEEDING
+            class RscPicture_1303: RscPictureGUI
+            {
+                idc = 1303;
+                text = "\z\addons\dayz_code\gui\status\status_bleeding_ca.paa";
+                x = 0.875 * safezoneW + safezoneX;
+                y = 0.93 * safezoneH + safezoneY;
+                w = 0.075;
+                h = 0.10;
+                colorText[] = {1,1,1,0.5};
+            };
+            /*-----------------------------------------------*/
+            //SURVIVOR KILLS
+			class RscText_1400: RscTextGUIK
+            {
+                idc = 1400;
+                text = "1000";
+                x = 0.683 * safezoneW + safezoneX;
+                y = 0.931 * safezoneH + safezoneY;
+                w = 0.037 * safezoneW;
+                h = 0.047 * safezoneH;
+                colorText[] = {1,1,1,1.0};
+                size = 0.03;
+                sizeEx = 0.03;
+            };
+			//BANDIT KILLS
+            class RscText_1402: RscTextGUIK
+            {
+                idc = 1402;
+                text = "1000";
+                x = 0.726 * safezoneW + safezoneX;
+                y = 0.931 * safezoneH + safezoneY;
+                w = 0.037 * safezoneW;
+                h = 0.047 * safezoneH;
+                colorText[] = {1,1,1,1.0};
+                size = 0.03;
+                sizeEx = 0.03;
+            };
+			//ZOMBIE KILLS
+            class RscText_1403: RscTextGUIK
+            {
+                idc = 1403;
+                text = "1000";
+                x = 0.769 * safezoneW + safezoneX;
+                y = 0.931 * safezoneH + safezoneY;
+                w = 0.037 * safezoneW;
+                h = 0.047 * safezoneH;
+                colorText[] = {1,1,1,1.0};
+                size = 0.03;
+                sizeEx = 0.03;
+            };
+			//SERVER RESTART AMOUNT
+			class RscText_1422: RscTextGUIK
+            {
+                idc = 1422;
+                text = "1000";
+                x = 0.753 * safezoneW + safezoneX;
+                y = 0.961 * safezoneH + safezoneY;
+                w = 0.040 * safezoneW;
+                h = 0.047 * safezoneH;
+                colorText[] = {1,0.8,0,1.0};
+                size = 0.03;
+                sizeEx = 0.03;
+            };
+			//RESTART LABEL
+			class RscText_1425: RscTextGUIK
+            {
+                idc = 1425;
+                text = "Restart in (min):";
+                x = 0.673 * safezoneW + safezoneX;
+                y = 0.961 * safezoneH + safezoneY;
+                w = 0.09 * safezoneW;
+                h = 0.047 * safezoneH;
+                colorText[] = {1,1,1,1.0};
+                size = 0.03;
+                sizeEx = 0.03;
+            };			
+        };
+    };
+			class DeathScr {
+				  idd = -1;
+				  movingEnable = 0;
+				  duration = 10;
+				  fadein = 2;
+				  fadeout = 2;
+				  name="DeathScr";
+				  controls[]={"Picture"};
+				  class Picture {
+					x = safezoneX; y = safezoneY; w = safezoneW; h = safezoneH;
+					text="custom\death\DeathScr.jpg";
+					sizeEx = -1;
+					type=0;
+					idc=-1;
+					style=48;
+					colorBackground[]={0,0,0,0};
+					colorText[]={1,1,1,1};
+					font="Bitstream";
+			  };
+			};
+};
+
+#include "custom\snap_pro\snappoints.hpp"
+#include "plotManagement\defines.hpp"
+#include "plotManagement\plotManagement.hpp"
+#include "ZSC\config\ZSCdefines.hpp"
+#include "ZSC\config\ZSCdialogs.hpp"
+#include "zupa\advancedTrading\advancedTrading.hpp"
+#include "custom\chameleon\dialog\common.hpp"
+#include "custom\chameleon\dialog\SkinGui.hpp"
+#include "spawn\halo.hpp"
+#include "spawn\spawn.hpp"
+#include "custom\ckc\ckc_defines.hpp"
+#include "custom\ckc\ckc_ui.hpp"
+#include "custom\ckc\ckc_SafeUI.hpp"
